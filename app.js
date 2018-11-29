@@ -8,10 +8,11 @@ GAME RULES:
 - The first player to reach 100 points on GLOBAL score wins the game
 */
 
-let scores, roundScore, activePlayer;
+let scores, roundScore, activePlayer, diceDom;
 scores = [0, 0];
 roundScore = 0;
 activePlayer = 0;
+diceDom = document.querySelector('.dice');
 
 // Hide dice
 document.querySelector('.dice').style.display = 'none';
@@ -23,36 +24,51 @@ document.getElementById('current-0').textContent = '0';
 document.getElementById('current-1').textContent = '0';
 
 // Click event for roll button to display dice image depending on dice roll
-document.querySelector('.btn-roll').addEventListener('click', () => {
-    let dice = Math.floor(Math.random() * 6) + 1;
-    
-    let diceDom = document.querySelector('.dice');
-    diceDom.style.display = 'block';
-    diceDom.src = 'dice-' + dice + '.png';
+    document.querySelector('.btn-roll').addEventListener('click', () => {
+        let dice = Math.floor(Math.random() * 6) + 1;
+        
+        diceDom.style.display = 'block';
+        diceDom.src = 'dice-' + dice + '.png';
 
-    // Roundscore functionality
-    if (dice !== 1) {
-        // Adding dice roll to current round score
-        roundScore += dice;
-        document.querySelector('#current-' + activePlayer).textContent = roundScore;
-    } else {
-        // Switch active player and reset roud score
-        activePlayer === 0 ? activePlayer = 1 : activePlayer = 0;
-        roundScore = 0;
+        // Roundscore functionality
+        if (dice !== 1) {
+            // Adding dice roll to current round score
+            roundScore += dice;
+            document.querySelector('#current-' + activePlayer).textContent = roundScore;
+        } else {
+            nextPlayer();
+        }
+    });
 
-        // Display the reset round score
-        document.getElementById('current-0').textContent = 0;
-        document.getElementById('current-1').textContent = 0;
+// Click event for hold button to update global score
+    document.querySelector('.btn-hold').addEventListener('click', () => {
+        // Add current score to global score
+        scores[activePlayer] += roundScore;
+        document.getElementById('score-' + activePlayer).textContent = scores[activePlayer];
 
-        // Toggle the active player styles
-        document.querySelector('.player-0-panel').classList.toggle('active')
-        document.querySelector('.player-1-panel').classList.toggle('active')
+        // Check if player won the game
+        if (scores[activePlayer] >= 10) {
+            document.getElementById('name-' + activePlayer).textContent = 'WINNER!';
+            document.querySelector('.player-' + activePlayer + '-panel').classList.add('winner')
+            document.querySelector('.player-' + activePlayer + '-panel').classList.remove('active')
+            diceDom.style.display = 'none';
+        } else {
+            nextPlayer(); 
+        }
+    });
 
-        diceDom.style.display = 'none';
-    }
+let nextPlayer = () => {
+    // Switch active player and reset round score
+    activePlayer === 0 ? activePlayer = 1 : activePlayer = 0;
+    roundScore = 0;
 
-})
+    // Display the reset round score
+    document.getElementById('current-0').textContent = 0;
+    document.getElementById('current-1').textContent = 0;
 
+    // Toggle the active player styles
+    document.querySelector('.player-0-panel').classList.toggle('active')
+    document.querySelector('.player-1-panel').classList.toggle('active')
 
-
-
+    diceDom.style.display = 'none';
+}
